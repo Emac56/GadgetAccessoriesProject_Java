@@ -1,84 +1,54 @@
-package com.mycompany.emacgadgetaccessories_finaloutput.cp1;
-
 import java.util.Scanner;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class EmacGadgetAccessories_FinalOutputCp1 {
 
-    //Global Variables
     static Scanner input = new Scanner(System.in);
     static LocalDate date = LocalDate.now();
     static String saveReceipt = "";
 
-    //Display Welcome Message
     public static void showMainMenu() {
-        System.out.println("==============================");
-        System.out.println("WELCOME TO EMAC'S GADGET SHOP");
-        System.out.println("Your one-shop for accessories.");
-        System.out.println("==============================");
-
-        boolean loop = true;
-
-        while (loop) {
+        while (true) {
+            System.out.println("==============================");
+            System.out.println("WELCOME TO EMAC'S GADGET SHOP");
+            System.out.println("==============================");
             System.out.println(" [1] Order Accessories");
             System.out.println(" [2] View Recent Order");
             System.out.println(" [3] Exit");
             System.out.print("Choose an option: ");
+
             String choice = input.nextLine();
 
             switch (choice) {
                 case "1":
                     items();
                     break;
-
                 case "2":
-                    if (saveReceipt.equals("")) {
-                        System.out.println("No recent activity yet\n");
-                    } else {
-                        System.out.println(saveReceipt);
-                    }
+                    System.out.println(saveReceipt.isEmpty() ? "No recent order yet.\n" : saveReceipt);
                     break;
-
                 case "3":
-                    System.out.println("Thank you for visiting Gadget Shop");
-                    System.out.println("See you next time!");
+                    System.out.println("Thank you for shopping with us!");
                     System.exit(0);
-                    break;
-
                 default:
-                    System.out.println("\nInvalid input. Kindly select a valid option from menu.");
+                    System.out.println("Invalid choice.\n");
             }
         }
-        input.close();
     }
 
-    //Method to show items
-    public static void showItems(String[] item, double[] php) {
-        System.out.println("\nAVAILABLE ACCESSORIES:");
-        System.out.println("==================================================================");
-        System.out.println("ITEM NAME\t\t\t\tPRICE");
-        System.out.println("==================================================================");
-
-        for (int i = 0; i < item.length; i++) {
-            System.out.println((i + 1) + ". " + item[i] + "\tPHP " + php[i]);
-        }
-
-        System.out.println("==================================================================\n");
-    }
-
-    //Method for products and price
     public static void items() {
+
         String[] itemName = {
-            "Apple iPhone 14 128GB          ",
-            "Samsung Galaxy A54 256GB       ",
-            "Xiaomi Redmi Note 13 Pro 5G    ",
-            "Huawei FreeBuds SE Earbuds     ",
-            "JBL GO 3 Bluetooth Speaker    ",
-            "ASUS TUF Gaming F15            ",
-            "Logitech G213 RGB Keyboard    ",
-            "Anker PowerCore 20000mAh       ",
-            "GoPro HERO11 Black             ",
-            "Sony WH-1000XM4 Headphones    "
+            "Apple iPhone 14 128GB",
+            "Samsung Galaxy A54 256GB",
+            "Xiaomi Redmi Note 13 Pro 5G",
+            "Huawei FreeBuds SE",
+            "JBL GO 3 Speaker",
+            "ASUS TUF Gaming F15",
+            "Logitech G213 Keyboard",
+            "Anker PowerCore 20000mAh",
+            "GoPro HERO11",
+            "Sony WH-1000XM4"
         };
 
         double[] itemPrice = {
@@ -86,142 +56,126 @@ public class EmacGadgetAccessories_FinalOutputCp1 {
             48995, 2995, 1699, 29990, 16499
         };
 
-        showItems(itemName, itemPrice);
-        chooseItem(itemName, itemPrice);
+        ArrayList<String> cartItems = new ArrayList<>();
+        ArrayList<Integer> cartQty = new ArrayList<>();
+        ArrayList<Double> cartSubTotal = new ArrayList<>();
+
+        boolean buyMore = true;
+
+        while (buyMore) {
+            showItems(itemName, itemPrice);
+
+            System.out.print("Select item number: ");
+            int choice = Integer.parseInt(input.nextLine()) - 1;
+
+            if (choice < 0 || choice >= itemName.length) {
+                System.out.println("Invalid item.\n");
+                continue;
+            }
+
+            System.out.print("Enter quantity: ");
+            int qty = Integer.parseInt(input.nextLine());
+
+            double subtotal = qty * itemPrice[choice];
+
+            cartItems.add(itemName[choice]);
+            cartQty.add(qty);
+            cartSubTotal.add(subtotal);
+
+            System.out.print("Would you like to buy more? (Y/N): ");
+            buyMore = input.nextLine().equalsIgnoreCase("Y");
+        }
+
+        checkout(cartItems, cartQty, cartSubTotal);
     }
 
-    //Method for ordering
-    public static void chooseItem(String[] product, double[] price) {
+    public static void showItems(String[] item, double[] price) {
+        System.out.println("\nAVAILABLE ITEMS:");
+        System.out.println("------------------------------------");
+        for (int i = 0; i < item.length; i++) {
+            System.out.println((i + 1) + ". " + item[i] + " - PHP " + price[i]);
+        }
+        System.out.println("------------------------------------");
+    }
 
-        int pieces;
+    public static void checkout(
+        ArrayList<String> items,
+        ArrayList<Integer> qty,
+        ArrayList<Double> subtotal
+    ) {
+
         final int VAT = 12;
-        double totalPurchase;
-        double totalVat;
-        double totalAmount;
-        double cash;
-        double change;
+        double total = 0;
 
-        String customerName;
-        String address;
-        String contact;
+        System.out.print("\nEnter full name: ");
+        String name = input.nextLine();
 
-        
-        System.out.print("Select item number from the list: ");
-        int selectedItem = Integer.parseInt(input.nextLine()) - 1;
+        System.out.print("Enter address: ");
+        String address = input.nextLine();
 
-        if (selectedItem < 0 || selectedItem >= product.length) {
-            System.out.println("Invalid Option. Please choose between 1 to " + product.length);
-            return;
-        }
+        System.out.print("Enter contact number: ");
+        String contact = input.nextLine();
 
-        System.out.println("\nYou choose: " + product[selectedItem].trim() + " ₱" + price[selectedItem]);
-        
-        System.out.print("How many pieces would you like to buy?: ");
-        pieces = input.nextInt();
-        input.nextLine();
+        for (double sub : subtotal) total += sub;
 
-        System.out.print("Enter your full name: ");
-        customerName = input.nextLine();
+        double vatAmount = (total * VAT) / 100;
+        double totalAmount = total + vatAmount;
 
-        System.out.print("Enter your address: ");
-        address = input.nextLine();
+        System.out.println("\nTotal Amount: PHP " + totalAmount);
+        System.out.print("Enter cash: ");
+        double cash = Double.parseDouble(input.nextLine());
 
-        System.out.print("Enter your contact number: ");
-        contact = input.nextLine();
-
-        
-
-        totalPurchase = totalPurc(pieces, price[selectedItem]);
-        totalVat = totalVat(totalPurchase, VAT);
-        totalAmount = totalPurchase + totalVat;
-
-        System.out.println("Total amount to pay: " + totalAmount);
-        System.out.print("Enter your cash amount: ");
-        cash = input.nextDouble();
-        input.nextLine();
-        
-        //Check cash
         if (cash < totalAmount) {
-            System.out.println("\nINSUFFICIENT FUNDS!");
-            System.out.println("Your cash: PHP " + cash);
-            System.out.println("Total amount: PHP " + totalAmount);
+            System.out.println("Insufficient cash.\n");
             return;
         }
 
-        change = cash - totalAmount;
+        double change = cash - totalAmount;
 
-        showReceipt(
-            customerName,
-            address,
-            contact,
-            product[selectedItem],
-            totalPurchase,
-            totalVat,
-            totalAmount,
-            VAT,
-            pieces,
-            cash,
-            change
-        );
-
-        saveReceipt =
-            "\n=========== Recent Receipt ============" +
-            "\nCustomer Name: " + customerName +
-            "\nAddress: " + address +
-            "\nContact: " + contact +
-            "\nItem name: " + product[selectedItem] +
-            "\nItem quantity: " + pieces +
-            "\nSubtotal: PHP " + totalPurchase +
-            "\nVAT: PHP " + totalVat +
-            "\nTotal Amount: PHP " + totalAmount +
-            "\nCash: PHP " + cash +
-            "\nChange: PHP " + change +
-            "\n======================================";
+        showReceipt(name, address, contact, items, qty, total, vatAmount, totalAmount, cash, change);
     }
 
-    //Compute total purchase
-    public static double totalPurc(double a, double b) {
-        return a * b;
-    }
-
-    //Compute VAT
-    public static double totalVat(double c, double d) {
-        return (c * d) / 100;
-    }
-
-    //Show receipt
     public static void showReceipt(
         String name,
         String address,
         String contact,
-        String item,
-        double totalPurchase,
-        double totalvat,
-        double totalAmount,
-        int VAT,
-        int quantity,
+        ArrayList<String> items,
+        ArrayList<Integer> qty,
+        double subtotal,
+        double vat,
+        double total,
         double cash,
         double change
     ) {
 
-        System.out.println("\n========== RECEIPT ==========");
-        System.out.println("===== EMAC'S GADGET SHOP =====");
-        System.out.println("Customer Name: " + name);
-        System.out.println("Address: " + address);
-        System.out.println("Contact: " + contact);
-        System.out.println("Item: " + item);
-        System.out.println("Quantity: " + quantity);
-        System.out.println("Subtotal: PHP " + totalPurchase);
-        System.out.println("VAT: " + VAT + "%");
-        System.out.println("Total VAT: PHP " + totalvat);
-        System.out.println("Total Amount: PHP " + totalAmount);
-        System.out.println("Cash: PHP " + cash);
-        System.out.println("Change: PHP " + change);
-        System.out.println("Date Purchased: " + date);
-        System.out.println("================================\n");
+        StringBuilder receipt = new StringBuilder();
+
+        receipt.append("\n========== RECEIPT ==========\n");
+        receipt.append("EMAC'S GADGET SHOP\n");
+        receipt.append("Customer: ").append(name).append("\n");
+        receipt.append("Address: ").append(address).append("\n");
+        receipt.append("Contact: ").append(contact).append("\n\n");
+
+        for (int i = 0; i < items.size(); i++) {
+            receipt.append(items.get(i))
+                   .append(" x")
+                   .append(qty.get(i))
+                   .append("\n");
+        }
+
+        receipt.append("\nSubtotal: PHP ").append(subtotal);
+        receipt.append("\nVAT: PHP ").append(vat);
+        receipt.append("\nTotal: PHP ").append(total);
+        receipt.append("\nCash: PHP ").append(cash);
+        receipt.append("\nChange: PHP ").append(change);
+        receipt.append("\nDate: ").append(date);
+        receipt.append("\n============================\n");
+
+        System.out.println(receipt);
+        saveReceipt = receipt.toString();
     }
 
     public static void main(String[] args) {
         showMainMenu();
     }
-}
+            }
